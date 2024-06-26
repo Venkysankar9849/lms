@@ -1,48 +1,67 @@
 pipeline {
     agent any
-
     stages {
-        stage('LMS-Code-Analysis') {
+        stage('docker cleaning') {
             steps {
-                echo 'Sonar Analysis'
-                sh 'cd webapp && sudo docker run  --rm -e SONAR_HOST_URL="http://54.212.22.255:9000" -e SONAR_LOGIN="sqp_e3e91a31407cf311adf9c52d966075a60ee480e0"  -v ".:/usr/src" sonarsource/sonar-scanner-cli -Dsonar.projectKey=lms'
-                echo 'Analysis Completed'
+                echo "cleaning up docker"
+                script {
+                    //Stop and remove all running containers
+                    sh 'docker stop $(docker ps -a -q) || true'
+                    sh 'docker rm $(docker ps -a -q) || true'
+                    //Remove all docker images
+                    sh 'docker rmi $(docker images -a -q) || true'
+                    //Cleaning up any other docker resources
+                    sh 'docker system prune -f || true'
+                }
+                echo 'Cleaning up completed'
             }
         }
-
-        stage('LMS-Build') {
-            steps {
-                echo 'Building LMS'
-                sh 'cd webapp && npm install && npm run build'
-                echo 'Building Completed'
-            }
-        }
-
-        stage('LMS-Release') {
+        stage('check for backend package.json') {
             steps {
                 script {
-                    echo "Publish LMS Artifacts"       
-                    def packageJSON = readJSON file: 'webapp/package.json'
-                    def packageJSONVersion = packageJSON.version
-                    echo "${packageJSONVersion}"  
-                    sh "zip webapp/lms-${packageJSONVersion}.zip -r webapp/dist"
-                    sh "curl -v -u admin:lms12345 --upload-file webapp/lms-${packageJSONVersion}.zip http://54.212.22.255:8081/repository/lms/"     
-            }
+                    echo 'checking if package.json exists in the directory'
+                    dir('api'){
+                        sh 'ls -l package.json'
+                    }
+                }
+                
             }
         }
-
-        stage('LMS-Deploy') {
+        stage('Build and Push Backend docker images') {
+            steps {
+                echo "build docker images and push to docker hub"
+                dir('api') {
+                    script {
+                        withDockerRegistry([credentialsId: 'ravisaketi08', url: 'https://index.docker.io/v1/']) {
+                            sh "docker build -t ravisaketi08/backend-app ."
+                            sh "docker push ravisaketi08/backend-app"
+                        }
+                    }
+                }
+            }
+        }
+        stage('check for frontend package.json') {
             steps {
                 script {
-                     echo "Deploy LMS"       
-                    def packageJSON = readJSON file: 'webapp/package.json'
-                    def packageJSONVersion = packageJSON.version
-                    echo "${packageJSONVersion}"  
-                    sh "curl -u admin:lms12345 -X GET \'http://54.212.22.255:8081/repository/lms/lms-${packageJSONVersion}.zip\' --output lms-'${packageJSONVersion}'.zip"
-                    sh 'sudo rm -rf /var/www/html/*'
-                    sh "sudo unzip -o lms-'${packageJSONVersion}'.zip"
-                    sh "sudo cp -r webapp/dist/* /var/www/html"
+                    echo 'checking if package.json exists in the directory'
+                    dir('webapp'){
+                        sh 'ls -l package.json'
+                    }
+                }
+                
             }
+        }
+        stage('Build and Push frontend docker images') {
+            steps {
+                echo "build docker images and push to docker hub"
+                dir('webapp') {
+                    script {
+                        withDockerRegistry([credentialsId: 'ravisaketi08', url: 'https://index.docker.io/v1/']) {
+                            sh "docker build -t ravisaketi08/frontend-app ."
+                            sh "docker push ravisaketi08/frontend-app"
+                        }
+                    }
+                }
             }
         }
     }
