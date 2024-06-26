@@ -6,12 +6,12 @@ pipeline {
                 echo "cleaning up docker"
                 script {
                     //Stop and remove all running containers
-                    sh 'docker stop $(docker ps -a -q) || true'
-                    sh 'docker rm $(docker ps -a -q) || true'
+                    sh 'sudo docker stop $(docker ps -a -q) || true'
+                    sh 'sudo docker rm $(docker ps -a -q) || true'
                     //Remove all docker images
-                    sh 'docker rmi $(docker images -a -q) || true'
+                    sh 'sudo docker rmi $(docker images -a -q) || true'
                     //Cleaning up any other docker resources
-                    sh 'docker system prune -f || true'
+                    sh 'sudo docker system prune -f || true'
                 }
                 echo 'Cleaning up completed'
             }
@@ -33,8 +33,8 @@ pipeline {
                 dir('api') {
                     script {
                         withDockerRegistry([credentialsId: 'ravisaketi08', url: 'https://index.docker.io/v1/']) {
-                            sh "docker build -t ravisaketi08/backend-app ."
-                            sh "docker push ravisaketi08/backend-app"
+                            sh "sudo docker build -t ravisaketi08/backend-app ."
+                            sh "sudo docker push ravisaketi08/backend-app"
                         }
                     }
                 }
@@ -57,8 +57,8 @@ pipeline {
                 dir('webapp') {
                     script {
                         withDockerRegistry([credentialsId: 'ravisaketi08', url: 'https://index.docker.io/v1/']) {
-                            sh "docker build -t ravisaketi08/frontend-app ."
-                            sh "docker push ravisaketi08/frontend-app"
+                            sh "sudo docker build -t ravisaketi08/frontend-app ."
+                            sh "sudo docker push ravisaketi08/frontend-app"
                         }
                     }
                 }
