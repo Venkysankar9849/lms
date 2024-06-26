@@ -6,10 +6,10 @@ pipeline {
                 echo "cleaning up docker"
                 script {
                     //Stop and remove all running containers
-                    sh 'sudo docker stop $(docker ps -a -q) || true'
-                    sh 'sudo docker rm $(docker ps -a -q) || true'
+                    sh 'sudo docker stop $(sudo docker ps -a -q) || true'
+                    sh 'sudo docker rm $(sudo docker ps -a -q) || true'
                     //Remove all docker images
-                    sh 'sudo docker rmi $(docker images -a -q) || true'
+                    sh 'sudo docker rmi $(sudo docker images -a -q) || true'
                     //Cleaning up any other docker resources
                     sh 'sudo docker system prune -f || true'
                 }
