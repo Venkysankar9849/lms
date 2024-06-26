@@ -32,9 +32,9 @@ pipeline {
                 echo "build docker images and push to docker hub"
                 dir('api') {
                     script {
-                        withDockerRegistry([credentialsId: 'ravisaketi08', url: 'https://index.docker.io/v1/']) {
-                            sh "sudo docker build -t ravisaketi08/backend-app ."
-                            sh "sudo docker push ravisaketi08/backend-app"
+                        docker.withRegistry('https://hub.docker.com', 'ravisaketi08') {
+                        // Docker build and push commands
+                        docker.build('backend-app:latest').push()
                         }
                     }
                 }
@@ -56,9 +56,9 @@ pipeline {
                 echo "build docker images and push to docker hub"
                 dir('webapp') {
                     script {
-                        withDockerRegistry([credentialsId: 'ravisaketi08', url: 'https://index.docker.io/v1/']) {
-                            sh "sudo docker build -t ravisaketi08/frontend-app ."
-                            sh "sudo docker push ravisaketi08/frontend-app"
+                        docker.withRegistry('https://hub.docker.com', 'ravisaketi08') {
+                        // Docker build and push commands
+                        docker.build('frontend-app:latest').push()
                         }
                     }
                 }
