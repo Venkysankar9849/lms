@@ -32,7 +32,7 @@ pipeline {
                 echo "build docker images and push to docker hub"
                 dir('api') {
                     script {
-                        docker.withRegistry('https://hub.docker.com/repositories/ravisaketi08', 'ravisaketi08') {
+                        docker.withRegistry('https://hub.docker.com/repositories/ravisaketi08', 'ravisaketio8') {
                         // Docker build and push commands
                         docker.build('backend-app:latest').push()
                         }
@@ -56,7 +56,7 @@ pipeline {
                 echo "build docker images and push to docker hub"
                 dir('webapp') {
                     script {
-                        docker.withRegistry('https://hub.docker.com/repositories/ravisaketi08', 'ravisaketi08') {
+                        docker.withRegistry('https://hub.docker.com/repositories/ravisaketi08', 'ravisaketio8') {
                         // Docker build and push commands
                         docker.build('frontend-app:latest').push()
                         }
