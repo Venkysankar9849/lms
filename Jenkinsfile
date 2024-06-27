@@ -60,8 +60,8 @@ pipeline {
                     script {
                         withDockerRegistry([credentialsId: 'ravisaketi08', url: 'https://index.docker.io/v1/']) {
                             sh """
-                                docker build -t ravisaketi08/backend-app:latest .
-                                docker push ravisaketi08/backend-app:latest
+                                docker build -t ravisaketi08/frontend-app:latest .
+                                docker push ravisaketi08/frontend-app:latest
                             """
                         }
                     }
