@@ -32,9 +32,11 @@ pipeline {
                 echo "build docker images and push to docker hub"
                 dir('api') {
                     script {
-                        docker.withRegistry('https://hub.docker.com', 'b28986bc-198f-4227-b30c-da590aa94b28') {
-                        // Docker build and push commands
-                        docker.build('backend-app:latest').push()
+                        withDockerRegistry([credentialsId: 'ravisaketi08', url: 'https://index.docker.io/v1/']) {
+                            sh """
+                                docker build -t ravisaketi08/backend-app:latest .
+                                docker push ravisaketi08/backend-app:latest
+                            """
                         }
                     }
                 }
@@ -56,9 +58,11 @@ pipeline {
                 echo "build docker images and push to docker hub"
                 dir('webapp') {
                     script {
-                        docker.withRegistry('https://hub.docker.com', 'b28986bc-198f-4227-b30c-da590aa94b28') {
-                        // Docker build and push commands
-                        docker.build('frontend-app:latest').push()
+                        withDockerRegistry([credentialsId: 'ravisaketi08', url: 'https://index.docker.io/v1/']) {
+                            sh """
+                                docker build -t ravisaketi08/backend-app:latest .
+                                docker push ravisaketi08/backend-app:latest
+                            """
                         }
                     }
                 }
