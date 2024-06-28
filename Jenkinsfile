@@ -32,7 +32,7 @@ pipeline {
                 echo "build docker images and push to docker hub"
                 dir('api') {
                     script {
-                        withDockerRegistry([credentialsId: 'dockerhub', url: 'https://hub.docker.com/']) {
+                        withDockerRegistry([credentialsId: 'mydockerhub', url: 'https://hub.docker.com/']) {
                             sh """
                                 docker build -t ravisaketi08/backend-app:latest .
                                 docker push ravisaketi08/backend-app:latest
@@ -58,7 +58,7 @@ pipeline {
                 echo "build docker images and push to docker hub"
                 dir('webapp') {
                     script {
-                        withDockerRegistry([credentialsId: 'dockerhub', url: 'https://hub.docker.com/']) {
+                        withDockerRegistry([credentialsId: 'mydockerhub', url: 'https://hub.docker.com/']) {
                             sh """
                                 docker build -t ravisaketi08/frontend-app:latest .
                                 docker push ravisaketi08/frontend-app:latest
