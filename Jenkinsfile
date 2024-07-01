@@ -5,10 +5,16 @@ pipeline {
         stage('Docker Cleaning') {
             steps {
                 script {
-                    sh 'docker stop $(docker ps -a -q) || true'
-                    sh 'docker rm $(docker ps -a -q) || true'
-                    sh 'docker rmi $(docker images -a -q) || true'
-                    sh 'docker system prune -f || true'
+                    def containers = sh(script: 'docker ps -a -q', returnStdout: true).trim()
+                    if (containers) {
+                        sh "docker stop ${containers}"
+                        sh "docker rm ${containers}"
+                    }
+                    def images = sh(script: 'docker images -a -q', returnStdout: true).trim()
+                    if (images) {
+                        sh "docker rmi ${images}"
+                    }
+                    sh 'docker system prune -f'
                 }
                 echo 'Cleaning up Docker completed'
             }
