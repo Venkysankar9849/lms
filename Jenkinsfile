@@ -31,26 +31,7 @@ pipeline {
                     }
                 }
             }
-        }
-
-        stage('Deploy Backend to EKS') {
-            steps {
-                echo 'Configuring EKS Cluster...'
-                // sh 'aws eks update-kubeconfig --name eks-cluster --region us-west-1'
-                
-                dir('api') {
-                    echo 'Deploying backend database...'
-                    sh 'kubectl apply -f pg-deployment.yml'
-                    sh 'kubectl apply -f pg-service.yml'
-                    
-                    echo 'Deploying backend application...'
-                    sh 'kubectl apply -f be-configmap.yml'
-                    sh 'kubectl apply -f be-deployment.yml'
-                    sh 'kubectl apply -f be-service.yaml'
-                }
-            }
-        }
-        
+        }    
         stage('Build and Push Frontend Docker Images') {
             steps {
                 dir('webapp') {
@@ -63,19 +44,6 @@ pipeline {
                 }
             }
         }
-        stage('Deploy Frontend to EKS') {
-            steps {
-                echo 'Configuring EKS Cluster...'
-               // sh 'aws eks update-kubeconfig --name eks-cluster --region us-west-1'
-                
-                dir('webapp') {
-                    echo 'Deploying frontend application...'
-                    sh 'kubectl apply -f fe-deployment.yml'
-                    sh 'kubectl apply -f fe-service.yml'
-                }
-            }
-        }
-
         stage('Final Message') {
             steps {
                 echo "You have successfully completed deploying your LMS app!"
