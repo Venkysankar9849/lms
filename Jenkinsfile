@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    
+
     stages {
         stage('Docker Cleaning') {
             steps {
@@ -32,13 +32,15 @@ pipeline {
                 }
             }
         }
+
         stage('Deploying App to Kubernetes') {   
-          steps {  
-              script {    
-                  kubernetesDeploy(configs: "pg-deployment.yml", kubeconfigId: "kubernetes")
-              }
-          }
+            steps {  
+                script {    
+                    kubernetesDeploy(configs: "pg-deployment.yml", kubeconfigId: "kubernetes")
+                }
+            }
         }
+
         stage('Build and Push Frontend Docker Images') {
             steps {
                 dir('webapp') {
@@ -51,6 +53,7 @@ pipeline {
                 }
             }
         }
+
         stage('Final Message') {
             steps {
                 echo "You have successfully completed deploying your LMS app!"
