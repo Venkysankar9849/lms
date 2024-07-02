@@ -32,15 +32,15 @@ pipeline {
                 }
             }
         }
-
         stage('Deploying App to Kubernetes') {   
             steps {  
-                script {    
-                    kubernetesDeploy(configs: "pg-deployment.yml", kubeconfigId: "kubernetes")
+                dir('api') {
+                    script {    
+                        kubernetesDeploy(configs: "pg-deployment.yml", kubeconfigId: "kubernetes")
+                    }
                 }
             }
-        }
-
+        }                 
         stage('Build and Push Frontend Docker Images') {
             steps {
                 dir('webapp') {
