@@ -36,7 +36,7 @@ pipeline {
             steps {  
                 dir('api') {
                     script {    
-                        kubernetesDeploy(configs: "pg-deployment.yml", kubeconfigId: "kubernetes")
+                        kubernetesDeploy(configs: "pg-deployment.yml", kubeconfigId: "k8s")
                     }
                 }
             }
