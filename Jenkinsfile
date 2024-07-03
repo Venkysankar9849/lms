@@ -44,47 +44,11 @@ pipeline {
                 withAWS(credentials: 'awsid', region: 'us-west-1') {
                     dir('api') {
                         // Deploy backend database
-                        sh 'kubectl apply -f pg-deployment.yaml'
-                        sh 'kubectl apply -f pg-service.yaml'
-                        
-                        // Deploy backend application
-                        sh 'kubectl apply -f be-configmap.yaml'
-                        sh 'kubectl apply -f be-deployment.yaml'
-                        sh 'kubectl apply -f be-service.yaml'
+                        sh 'kubectl apply -f pg-deployment.yml'
                     }
                 }
             }
         }
-        
-        stage('Build and Push Frontend Docker Images') {
-            steps {
-                dir('webapp') {
-                    script {
-                        withDockerRegistry([credentialsId: 'mydockerhub', url: 'https://index.docker.io/v1/']) {
-                            // Build frontend Docker image
-                            sh 'docker build -t ravisaketi08/frontend-app:latest .'
-                            
-                            // Push frontend Docker image to Docker Hub
-                            sh 'docker push ravisaketi08/frontend-app:latest'
-                        }
-                    }
-                }
-            }
-        }
-        
-        stage('Deploy Frontend to EKS') {
-            steps {
-                echo 'Configuring EKS Cluster...'
-                withAWS(credentials: 'awsid', region: 'us-west-1') {
-                    dir('webapp') {
-                        // Deploy frontend application
-                        sh 'kubectl apply -f fe-deployment.yaml'
-                        sh 'kubectl apply -f fe-service.yaml'
-                    }
-                }
-            }
-        }
-
         stage('Final Message') {
             steps {
                 echo "You have successfully completed deploying your LMS app!"
