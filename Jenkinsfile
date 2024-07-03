@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         AWS_REGION = 'us-west-1'
-        AWS_CREDENTIALS = 'awsid' // This is the ID of your AWS credentials in Jenkins
+        AWS_CREDENTIALS = 'awsid' // Ensure this matches your Jenkins credentials ID
     }
     
     stages {
@@ -12,7 +12,7 @@ pipeline {
                 dir('api') {
                     script {
                         withDockerRegistry([credentialsId: 'mydockerhub', url: 'https://index.docker.io/v1/']) {
-                            sh 'docker build -t ravisaketi08/backend-app:latest .'                            
+                            sh 'docker build -t ravisaketi08/backend-app:latest .'
                             sh 'docker push ravisaketi08/backend-app:latest'
                         }
                     }
@@ -22,10 +22,12 @@ pipeline {
         stage('Deploy Backend to EKS') {
             steps {
                 echo 'Configuring EKS Cluster...'
-                withAWS(credentials: 'awsid', region: 'us-west-1') {
-                    dir('api') {
-                        // Deploy backend database
-                        sh 'kubectl apply -f pg-deployment.yaml'
+                script {
+                    withAWS(credentials: 'awsid', region: 'us-west-1') {
+                        dir('api') {
+                            // Example: Deploy backend using kubectl apply
+                            sh 'kubectl apply -f pg-deployment.yaml'
+                        }
                     }
                 }
             }
