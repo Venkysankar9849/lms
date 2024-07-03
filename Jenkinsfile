@@ -1,5 +1,10 @@
 pipeline {
-    agent any  // Runs all stages on any available node
+    agent any
+    
+    environment {
+        AWS_REGION = 'us-west-1'
+        AWS_CREDENTIALS = 'awsid' // This is the ID of your AWS credentials in Jenkins
+    }
     
     stages {
         stage('Docker Cleaning') {
@@ -36,17 +41,17 @@ pipeline {
         stage('Deploy Backend to EKS') {
             steps {
                 echo 'Configuring EKS Cluster...'
-                sh 'aws eks update-kubeconfig --name eks-cluster --region us-west-1'
-                
-                dir('api') {
-                    // Deploy backend database
-                    sh 'kubectl apply -f pg-deployment.yaml'
-                    sh 'kubectl apply -f pg-service.yaml'
-                    
-                    // Deploy backend application
-                    sh 'kubectl apply -f be-configmap.yaml'
-                    sh 'kubectl apply -f be-deployment.yaml'
-                    sh 'kubectl apply -f be-service.yaml'
+                withAWS(credentials: 'awsid', region: 'us-west-1') {
+                    dir('api') {
+                        // Deploy backend database
+                        sh 'kubectl apply -f pg-deployment.yaml'
+                        sh 'kubectl apply -f pg-service.yaml'
+                        
+                        // Deploy backend application
+                        sh 'kubectl apply -f be-configmap.yaml'
+                        sh 'kubectl apply -f be-deployment.yaml'
+                        sh 'kubectl apply -f be-service.yaml'
+                    }
                 }
             }
         }
@@ -70,12 +75,12 @@ pipeline {
         stage('Deploy Frontend to EKS') {
             steps {
                 echo 'Configuring EKS Cluster...'
-                sh 'aws eks update-kubeconfig --name eks-cluster --region us-west-1'
-                
-                dir('webapp') {
-                    // Deploy frontend application
-                    sh 'kubectl apply -f fe-deployment.yaml'
-                    sh 'kubectl apply -f fe-service.yaml'
+                withAWS(credentials: 'awsid', region: 'us-west-1') {
+                    dir('webapp') {
+                        // Deploy frontend application
+                        sh 'kubectl apply -f fe-deployment.yaml'
+                        sh 'kubectl apply -f fe-service.yaml'
+                    }
                 }
             }
         }
