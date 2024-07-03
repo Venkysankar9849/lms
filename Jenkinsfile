@@ -51,7 +51,6 @@ pipeline {
                 }
             }
         }
-
         stage('Final Message') {
             steps {
                 echo "You have successfully completed deploying your LMS app!"
