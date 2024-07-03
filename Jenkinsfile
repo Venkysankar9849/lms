@@ -1,6 +1,9 @@
 pipeline {
-    agent any
-
+    agent {
+        node {
+            label 'slave'
+        }
+    }
     stages {
         stage('Docker Cleaning') {
             steps {
@@ -19,7 +22,6 @@ pipeline {
                 echo 'Cleaning up Docker completed'
             }
         }
-        
         stage('Build and Push Backend Docker Images') {
             steps {
                 dir('api') {
@@ -48,7 +50,7 @@ pipeline {
                     sh 'kubectl apply -f be-service.yaml'
                 }
             }
-        }                
+        }
         stage('Build and Push Frontend Docker Images') {
             steps {
                 dir('webapp') {
@@ -65,6 +67,17 @@ pipeline {
             steps {
                 echo "You have successfully completed deploying your LMS app!"
             }
+        }
+    }
+    post {
+        always {
+            echo 'Pipeline execution complete'
+        }
+        success {
+            echo 'Pipeline executed successfully'
+        }
+        failure {
+            echo 'Pipeline failed'
         }
     }
 }
