@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        REGISTRY_CREDENTIALS = credentials('docker-hub-credentials')
+        REGISTRY_CREDENTIALS = credentials('mydockerhub') // Correct credentials ID for Docker Hub
         AWS_CREDENTIALS = 'awsid' // The ID for AWS credentials in Jenkins
     }
 
@@ -25,7 +25,7 @@ pipeline {
             steps {
                 dir('api') {
                     script {
-                        docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
+                        docker.withRegistry('https://index.docker.io/v1/', "${REGISTRY_CREDENTIALS}") {
                             sh 'docker build -t ravisaketi08/backend-app:latest .'
                             sh 'docker push ravisaketi08/backend-app:latest'
                         }
@@ -46,7 +46,7 @@ pipeline {
             steps {
                 dir('web') {
                     script {
-                        docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
+                        docker.withRegistry('https://index.docker.io/v1/', "${REGISTRY_CREDENTIALS}") {
                             sh 'docker build -t ravisaketi08/frontend-app:latest .'
                             sh 'docker push ravisaketi08/frontend-app:latest'
                         }
@@ -65,8 +65,12 @@ pipeline {
 
         stage('Clean Up Docker Images') {
             steps {
-                sh 'docker rmi ravisaketi08/backend-app:latest || true'
-                sh 'docker rmi ravisaketi08/frontend-app:latest || true'
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', "${REGISTRY_CREDENTIALS}") {
+                        sh 'docker rmi ravisaketi08/backend-app:latest || true'
+                        sh 'docker rmi ravisaketi08/frontend-app:latest || true'
+                    }
+                }
             }
         }
 
@@ -74,14 +78,6 @@ pipeline {
             steps {
                 echo 'Pipeline completed successfully!'
             }
-        }
-    }
-
-    post {
-        failure {
-            mail to: 'you@example.com',
-                 subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
-                 body: "Something went wrong with ${env.JOB_NAME}."
         }
     }
 }
