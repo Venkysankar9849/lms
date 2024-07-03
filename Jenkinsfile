@@ -1,11 +1,11 @@
 pipeline {
-    agent {
-        node {
-            label 'slave'
-        }
-    }
+    agent none  // Disable node usage
+    
     stages {
         stage('Docker Cleaning') {
+            agent {
+                label 'slave'  // Optional: Specify label if you need a specific node for this stage
+            }
             steps {
                 script {
                     sh 'docker stop $(docker ps -a -q) || true'
@@ -18,6 +18,9 @@ pipeline {
         }
         
         stage('Build and Push Backend Docker Images') {
+            agent {
+                label 'slave'  // Optional: Specify label if you need a specific node for this stage
+            }
             steps {
                 dir('api') {
                     script {
@@ -29,7 +32,11 @@ pipeline {
                 }
             }
         }
+        
         stage('Deploy Backend to EKS') {
+            agent {
+                label 'slave'  // Optional: Specify label if you need a specific node for this stage
+            }
             steps {
                 echo 'Configuring EKS Cluster...'
                 sh 'aws eks update-kubeconfig --name eks-cluster --region us-west-1'
@@ -46,7 +53,11 @@ pipeline {
                 }
             }
         }
+        
         stage('Build and Push Frontend Docker Images') {
+            agent {
+                label 'slave'  // Optional: Specify label if you need a specific node for this stage
+            }
             steps {
                 dir('webapp') {
                     script {
@@ -58,7 +69,11 @@ pipeline {
                 }
             }
         }
+        
         stage('Deploy Frontend to EKS') {
+            agent {
+                label 'slave'  // Optional: Specify label if you need a specific node for this stage
+            }
             steps {
                 echo 'Configuring EKS Cluster...'
                 sh 'aws eks update-kubeconfig --name eks-cluster --region us-west-1'
@@ -72,6 +87,7 @@ pipeline {
         }
 
         stage('Final Message') {
+            agent any  // Use 'any' agent to run the final stage on any available node
             steps {
                 echo "You have successfully completed deploying your LMS app!"
             }
