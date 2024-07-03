@@ -32,22 +32,13 @@ pipeline {
                 }
             }
         }
-        stage('Deploying App to Kubernetes') {
-            steps {
-                dir('api') {
-                    withCredentials([string(credentialsId: 'secretid', variable: 'KUBECONFIG_CONTENT')]) {
-                        script {
-                            def kubeconfigFile = "${env.WORKSPACE}/kubeconfig.yaml"
-                            writeFile file: kubeconfigFile, text: env.KUBECONFIG_CONTENT
-                            kubernetesDeploy(
-                                configs: "pg-deployment.yml", 
-                                kubeconfigPath: kubeconfigFile
-                            )
-                        }
-                    }
+        stage('Deploy to k8s'){
+            steps{
+                script{
+                    kubernetesDeploy (configs: 'pg-deployment.yml',kubeconfigId: 'kubeid')
                 }
             }
-        }                 
+        }                
         stage('Build and Push Frontend Docker Images') {
             steps {
                 dir('webapp') {
