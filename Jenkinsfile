@@ -19,6 +19,17 @@ pipeline {
                 }
             }
         }
+        stage('Deploy Backend to EKS') {
+            steps {
+                echo 'Configuring EKS Cluster...'
+                withAWS(credentials: 'awsid', region: 'us-west-1') {
+                    dir('api') {
+                        // Deploy backend database
+                        sh 'kubectl apply -f pg-deployment.yaml'
+                    }
+                }
+            }
+        }
         stage('Final Message') {
             steps {
                 echo "You have successfully completed deploying your LMS app!"
