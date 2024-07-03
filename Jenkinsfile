@@ -21,10 +21,13 @@ pipeline {
         }
         stage('Deploy Backend to EKS') {
             steps { 
-                dir('api') {
+                dir('./api') {
                     script {
                         withAWS(credentials: 'awsid', region: 'us-west-1') {
-                            sh 'kubectl apply -f pg-deployment.yml'
+                            sh 'kubectl version --client' // Verify kubectl version
+                            sh 'kubectl config view' // Display kubectl config for debugging
+                            sh 'kubectl get pods --all-namespaces' // List pods to verify connectivity
+                            sh 'kubectl apply -f pg-deployment.yml' // Attempt deployment
                         }
                     }
                 }
