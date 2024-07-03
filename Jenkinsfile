@@ -7,12 +7,18 @@ pipeline {
     }
     
     stages {
+        stage('Set Kubectl Context') {
+            steps {
+                sh 'kubectl config use-context arn:aws:eks:us-west-1:211125493013:cluster/eks-cluster'
+            }
+        }
+        
         stage('Build and Push Backend Docker Images') {
             steps {
                 dir('api') {
                     script {
                         withDockerRegistry([credentialsId: 'mydockerhub', url: 'https://index.docker.io/v1/']) {
-                            sh 'docker build -t ravisaketi08/backend-app:latest .'                            
+                            sh 'docker build -t ravisaketi08/backend-app:latest .'
                             sh 'docker push ravisaketi08/backend-app:latest'
                         }
                     }
@@ -24,6 +30,7 @@ pipeline {
             steps { 
                 script {
                     sh 'kubectl get nodes'
+                    // Add more Kubernetes deployment steps as needed
                 }
             }
         }
