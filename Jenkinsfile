@@ -4,7 +4,6 @@ pipeline {
             label 'slave'
         }
     }
-
     stages {
         stage('Docker Cleaning') {
             steps {
