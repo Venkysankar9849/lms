@@ -1,82 +1,93 @@
 pipeline {
     agent any
-
+    
     environment {
-        REGISTRY_CREDENTIALS = credentials('mydockerhub') // Correct credentials ID for Docker Hub
-        AWS_CREDENTIALS = 'awsid' // The ID for AWS credentials in Jenkins
+        AWS_REGION = 'us-west-1'
+        AWS_CREDENTIALS = 'awsid' // This is the ID of your AWS credentials in Jenkins
     }
-
+    
     stages {
-        stage('Checkout') {
+        stage('Docker Cleaning') {
             steps {
-                git branch: 'dev', url: 'https://github.com/Ravisaketi/lms.git'
+                script {
+                    // Stop and remove all Docker containers
+                    sh 'docker stop $(docker ps -a -q) || true'
+                    sh 'docker rm $(docker ps -a -q) || true'
+                    
+                    // Remove all Docker images and prune Docker system
+                    sh 'docker rmi $(docker images -a -q) || true'
+                    sh 'docker system prune -f || true'
+                }
+                echo 'Cleaning up Docker completed'
             }
         }
         
-        stage('Set Kubectl Context') {
-            steps {
-                withAWS(credentials: "${AWS_CREDENTIALS}", region: 'us-west-1') {
-                    sh 'aws eks update-kubeconfig --name eks-cluster --region us-west-1'
-                }
-            }
-        }
-
         stage('Build and Push Backend Docker Images') {
             steps {
                 dir('api') {
                     script {
-                        docker.withRegistry('https://index.docker.io/v1/', "${REGISTRY_CREDENTIALS}") {
+                        withDockerRegistry([credentialsId: 'mydockerhub', url: 'https://index.docker.io/v1/']) {
+                            // Build backend Docker image
                             sh 'docker build -t ravisaketi08/backend-app:latest .'
+                            
+                            // Push backend Docker image to Docker Hub
                             sh 'docker push ravisaketi08/backend-app:latest'
                         }
                     }
                 }
             }
         }
-
+        
         stage('Deploy Backend to EKS') {
             steps {
-                script {
-                    sh 'kubectl apply -f kubernetes/backend-deployment.yaml'
+                echo 'Configuring EKS Cluster...'
+                withAWS(credentials: 'awsid', region: 'us-west-1') {
+                    dir('api') {
+                        // Deploy backend database
+                        sh 'kubectl apply -f pg-deployment.yaml'
+                        sh 'kubectl apply -f pg-service.yaml'
+                        
+                        // Deploy backend application
+                        sh 'kubectl apply -f be-configmap.yaml'
+                        sh 'kubectl apply -f be-deployment.yaml'
+                        sh 'kubectl apply -f be-service.yaml'
+                    }
                 }
             }
         }
-
+        
         stage('Build and Push Frontend Docker Images') {
             steps {
-                dir('web') {
+                dir('webapp') {
                     script {
-                        docker.withRegistry('https://index.docker.io/v1/', "${REGISTRY_CREDENTIALS}") {
+                        withDockerRegistry([credentialsId: 'mydockerhub', url: 'https://index.docker.io/v1/']) {
+                            // Build frontend Docker image
                             sh 'docker build -t ravisaketi08/frontend-app:latest .'
+                            
+                            // Push frontend Docker image to Docker Hub
                             sh 'docker push ravisaketi08/frontend-app:latest'
                         }
                     }
                 }
             }
         }
-
+        
         stage('Deploy Frontend to EKS') {
             steps {
-                script {
-                    sh 'kubectl apply -f kubernetes/frontend-deployment.yaml'
-                }
-            }
-        }
-
-        stage('Clean Up Docker Images') {
-            steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', "${REGISTRY_CREDENTIALS}") {
-                        sh 'docker rmi ravisaketi08/backend-app:latest || true'
-                        sh 'docker rmi ravisaketi08/frontend-app:latest || true'
+                echo 'Configuring EKS Cluster...'
+                withAWS(credentials: 'awsid', region: 'us-west-1') {
+                    dir('webapp') {
+                        // Deploy frontend application
+                        sh 'kubectl apply -f fe-deployment.yaml'
+                        sh 'kubectl apply -f fe-service.yaml'
                     }
                 }
             }
         }
 
-        stage('Finish') {
+        stage('Final Message') {
             steps {
-                echo 'Pipeline completed successfully!'
+                echo "You have successfully completed deploying your LMS app!"
             }
         }
     }
