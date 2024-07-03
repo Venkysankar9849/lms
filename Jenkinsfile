@@ -5,7 +5,6 @@ pipeline {
         AWS_REGION = 'us-west-1'
         AWS_CREDENTIALS = 'awsid'
     }
-    
     stages {
         stage('Set Kubectl Context') {
             steps {
