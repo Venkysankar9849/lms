@@ -29,7 +29,6 @@ pipeline {
                 }
             }
         }
-
         stage('Deploy Backend to EKS') {
             steps {
                 echo 'Configuring EKS Cluster...'
