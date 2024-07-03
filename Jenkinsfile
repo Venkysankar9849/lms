@@ -44,7 +44,6 @@ pipeline {
                 withAWS(credentials: 'awsid', region: 'us-west-1') {
                     dir('api') {
                         echo 'Deploying backend database...'
-                        sh 'kubectl apply -f pg-secret.yml'
                         sh 'kubectl apply -f pg-deployment.yml'
                         sh 'kubectl apply -f pg-service.yml'
                         
