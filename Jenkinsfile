@@ -32,11 +32,18 @@ pipeline {
                 }
             }
         }
-        stage('Deploying App to Kubernetes') {   
-            steps {  
+        stage('Deploying App to Kubernetes') {
+            steps {
                 dir('api') {
-                    script {    
-                        kubernetesDeploy(configs: "pg-deployment.yml", kubeconfigId: "k8s")
+                    withCredentials([string(credentialsId: 'secretid', variable: 'KUBECONFIG_CONTENT')]) {
+                        script {
+                            def kubeconfigFile = "${env.WORKSPACE}/kubeconfig.yaml"
+                            writeFile file: kubeconfigFile, text: env.KUBECONFIG_CONTENT
+                            kubernetesDeploy(
+                                configs: "pg-deployment.yml", 
+                                kubeconfigPath: kubeconfigFile
+                            )
+                        }
                     }
                 }
             }
