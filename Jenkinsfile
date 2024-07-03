@@ -23,18 +23,7 @@ pipeline {
         stage('Deploy Backend to EKS') {
             steps { 
                 script {
-                    // Ensure kubectl is configured (already done manually)
-                    // kubectl config use-context <your-context> (if needed)
-                    
-                    // Verify kubectl configuration
-                    sh 'kubectl version --client'
-                    sh 'kubectl config view'
-                    
-                    // List pods to verify connectivity
-                    sh 'kubectl get pods --all-namespaces'
-                    
-                    // Deploy your application
-                    sh 'kubectl apply -f pg-deployment.yml'
+                    sh 'kubectl get nodes'
                 }
             }
         }
