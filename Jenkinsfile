@@ -18,7 +18,7 @@ pipeline {
                 dir('api') {
                     script {
                         withDockerRegistry([credentialsId: 'mydockerhub', url: 'https://index.docker.io/v1/']) {
-                            sh 'docker build -t ravisaketi08/backend-app:latest .'
+                            sh 'docker build -t ravisaketi08/backend-app:latest .'                            
                             sh 'docker push ravisaketi08/backend-app:latest'
                         }
                     }
@@ -30,7 +30,7 @@ pipeline {
             steps { 
                 script {
                     sh 'kubectl get nodes'
-                    // Add more Kubernetes deployment steps as needed
+                    sh 'kubectl apply -f kubernetes/deployment.yaml'  // Replace with your deployment YAML file path
                 }
             }
         }
