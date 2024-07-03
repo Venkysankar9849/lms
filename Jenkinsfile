@@ -32,10 +32,20 @@ pipeline {
                 }
             }
         }
-        stage('Deploy to k8s'){
-            steps{
-                script{
-                    kubernetesDeploy (configs: 'pg-deployment.yml',kubeconfigId: 'kubeid')
+        stage('Deploy Backend to EKS') {
+            steps {
+                echo 'Configuring EKS Cluster...'
+                sh 'aws eks update-kubeconfig --name eks-cluster --region us-west-1'
+                
+                dir('api') {
+                    echo 'Deploying backend database...'
+                    sh 'kubectl apply -f pg-deployment.yml'
+                    sh 'kubectl apply -f pg-service.yml'
+                    
+                    echo 'Deploying backend application...'
+                    sh 'kubectl apply -f be-configmap.yml'
+                    sh 'kubectl apply -f be-deployment.yml'
+                    sh 'kubectl apply -f be-service.yaml'
                 }
             }
         }                
