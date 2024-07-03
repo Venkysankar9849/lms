@@ -26,7 +26,7 @@ pipeline {
                     withAWS(credentials: 'awsid', region: 'us-west-1') {
                         dir('api') {
                             // Example: Deploy backend using kubectl apply
-                            sh 'kubectl apply -f pg-deployment.yaml'
+                            sh 'kubectl apply -f pg-deployment.yml'
                         }
                     }
                 }
