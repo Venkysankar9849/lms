@@ -46,7 +46,6 @@ pipeline {
                 }
             }
         }
-        
         stage('Build and Push Frontend Docker Images') {
             steps {
                 dir('webapp') {
