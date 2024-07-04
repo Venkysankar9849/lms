@@ -17,15 +17,15 @@ pipeline {
                 echo 'Cleaning up Docker completed'
             }
         }
-        //BACKEND
+        // BACKEND
         stage('Build and Push Backend Docker Image') {
             steps {
                 dir('api') {
                     script {
                         def version = sh(script: "jq -r .version package.json", returnStdout: true).trim()
                         withDockerRegistry([credentialsId: DOCKER_HUB_CREDENTIALS, url: 'https://index.docker.io/v1/']) {
-                            sh "docker build -t ravisaketi08/backend-app:${version} ."
-                            sh "docker push ravisaketi08/backend-app:${version}"
+                            sh "docker build -t ravisaketi08/backend-lms:${version} ."
+                            sh "docker push ravisaketi08/backend-lms:${version}"
                         }
                         echo 'Successfully Build and Push Backend Docker Image to DockerHub'
                     }
