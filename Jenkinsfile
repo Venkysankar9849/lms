@@ -6,6 +6,7 @@ pipeline {
         AWS_CREDENTIALS = 'awsid'
         KUBECONFIG = "${env.WORKSPACE}/.kube/config"
     }
+    
     stages {
         stage('Docker Cleaning') {
             steps {
