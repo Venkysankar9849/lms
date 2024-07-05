@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: backend-container
-          image: venkysankar9849/backend-lms
+          image: venkysankar9849/backend-app
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
