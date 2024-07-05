@@ -14,7 +14,7 @@ pipeline {
                     // Stop and remove all Docker containers
                     sh 'docker ps -a -q | xargs --no-run-if-empty docker stop || true'
                     sh 'docker ps -a -q | xargs --no-run-if-empty docker rm || true'
-                    // Remove all Docker images and prune Docker system
+                    // Remove all the Docker images and prune Docker system
                     sh 'docker images -a -q | xargs --no-run-if-empty docker rmi || true'
                     sh 'docker system prune -f || true'
                 }
