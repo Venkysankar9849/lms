@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         DOCKER_HUB_CREDENTIALS = 'mydockerhub'
-        AWS_REGION = 'us-west-1'
+        AWS_REGION = 'us-east-2'
         AWS_CREDENTIALS = 'awsid'
         KUBECONFIG = "${env.WORKSPACE}/.kube/config"
     }
@@ -27,8 +27,8 @@ pipeline {
                     script {
                         def version = sh(script: "jq -r .version package.json", returnStdout: true).trim()
                         withDockerRegistry([credentialsId: DOCKER_HUB_CREDENTIALS, url: 'https://index.docker.io/v1/']) {
-                            sh "docker build -t ravisaketi08/backend-lms:${version} ."
-                            sh "docker push ravisaketi08/backend-lms:${version}"
+                            sh "docker build -t venkysankar9849/backend-lms:${version} ."
+                            sh "docker push venkysankar9849/backend-lms:${version}"
                         }
                         echo 'Successfully Build and Push Backend Docker Image to DockerHub'
                     }
@@ -60,8 +60,8 @@ pipeline {
                     script {
                         def version = sh(script: "jq -r .version package.json", returnStdout: true).trim()
                         withDockerRegistry([credentialsId: DOCKER_HUB_CREDENTIALS, url: 'https://index.docker.io/v1/']) {
-                            sh "docker build -t ravisaketi08/frontend-lms:${version} ."
-                            sh "docker push ravisaketi08/frontend-lms:${version}"
+                            sh "docker build -t venkysankar9849/frontend-lms:${version} ."
+                            sh "docker push venkysankar9849/frontend-lms:${version}"
                         }
                         echo 'Successfully Build and Push Frontend Docker Image to DockerHub'
                     }
